@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-in Estagiários/AEE — GET Yolis da Silva</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --teal: #1F6F6B;
+    --teal-dark: #16504C;
+    --coral: #E0703F;
+    --ink: #232B2E;
+    --ink-soft: #5B6669;
+    --line: #E4E0D6;
+    --ok: #2F7D5A;
+    --ok-bg: #E7F3EC;
+    --warn: #B4501E;
+    --warn-bg: #FBEBE0;
+    --pending: #8A6D1E;
+    --pending-bg: #FBF2DD;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; margin:0;}
+
+  .wrap{max-width:880px; margin:0 auto; padding:28px 20px 60px;}
+
+  .top{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
+  .top .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border-radius:10px;
+    background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:600; font-size:18px;
+  }
+  .brand h1{font-size:19px;}
+  .brand p{margin:2px 0 0; font-size:12.5px; color:var(--ink-soft);}
+
+  .nav-btn{
+    background:none; border:1px solid var(--line); color:var(--ink-soft);
+    padding:7px 14px; border-radius:20px; font-size:13px; cursor:pointer; font-family:'Inter';
+  }
+  .nav-btn:hover{border-color:var(--teal); color:var(--teal);}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:28px; margin-bottom:18px;
+  }
+
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:6px;}
+  @media (max-width:560px){ .choices{grid-template-columns:1fr;} }
+  .choice{
+    border:1.5px solid var(--line); border-radius:14px; padding:24px 20px; cursor:pointer;
+    background:var(--card); text-align:left; transition:.15s;
+  }
+  .choice:hover{border-color:var(--teal); transform:translateY(-1px);}
+  .choice .icon{font-size:26px; margin-bottom:10px; display:block;}
+  .choice h3{font-size:16px; margin-bottom:6px;}
+  .choice p{font-size:13px; color:var(--ink-soft); margin:0; line-height:1.5;}
+
+  label{display:block; font-size:13px; font-weight:600; color:var(--ink-soft); margin:16px 0 6px;}
+  select, input[type=text], input[type=password], input[type=date]{
+    width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--line);
+    font-size:14.5px; font-family:'Inter'; background:#FCFBF8; color:var(--ink);
+  }
+  select:focus, input:focus{outline:2px solid var(--teal); outline-offset:1px; border-color:var(--teal);}
+
+  .btn{
+    border:none; border-radius:10px; padding:12px 20px; font-size:14.5px; font-weight:600;
+    cursor:pointer; font-family:'Inter'; margin-top:18px;
+  }
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-secondary{background:#fff; color:var(--ink); border:1px solid var(--line);}
+  .btn-full{width:100%;}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .btn-small{padding:7px 12px; font-size:12.5px; margin-top:0;}
+
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px;
+    font-size:12.5px; font-weight:600;
+  }
+  .pill-ok{background:var(--ok-bg); color:var(--ok);}
+  .pill-warn{background:var(--warn-bg); color:var(--warn);}
+  .pill-pending{background:var(--pending-bg); color:var(--pending);}
+
+  .info-box{
+    background:#F2F6F4; border:1px solid #DCE8E3; border-radius:12px; padding:16px 18px; margin-top:14px;
+  }
+  .info-box p{margin:0; font-size:14px; line-height:1.6;}
+  .info-box b{color:var(--teal-dark);}
+
+  .confirm{text-align:center; padding:10px 0;}
+  .confirm .big-icon{font-size:44px; margin-bottom:10px;}
+
+  .opt-check{
+    display:flex; align-items:center; gap:10px; padding:12px 14px; border:1.5px solid var(--line);
+    border-radius:10px; margin-bottom:8px; cursor:pointer; background:#fff;
+  }
+  .opt-check.checked{border-color:var(--teal); background:var(--ok-bg);}
+  .opt-check input{width:17px; height:17px; accent-color:var(--teal); cursor:pointer;}
+  .opt-check .opt-label{font-size:14px; font-weight:500;}
+  .opt-check .opt-sub{font-size:12px; color:var(--ink-soft);}
+
+  .summary-row{display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;}
+  .summary-chip{
+    flex:1; min-width:130px; background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px;
+  }
+  .summary-chip .num{font-family:'Fraunces',serif; font-size:26px; font-weight:600;}
+  .summary-chip .lbl{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th{text-align:left; padding:10px 12px; color:var(--ink-soft); font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1.5px solid var(--line);}
+  td{padding:12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .name-cell{font-weight:600;}
+  .muted{color:var(--ink-soft); font-size:12.5px;}
+
+  .estagiario-block{border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px; background:#FCFBF8;}
+  .estagiario-block .name-row{display:flex; gap:8px; align-items:center; margin-bottom:10px;}
+  .estagiario-block .name-row input{font-weight:600;}
+  .opcao-row{display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:6px;}
+  @media (max-width:560px){ .opcao-row{grid-template-columns:1fr;} }
+  .icon-btn{background:none; border:none; cursor:pointer; font-size:15px; color:var(--warn); padding:6px;}
+  .add-opt-btn{background:none; border:1px dashed var(--line); color:var(--ink-soft); padding:8px 12px; border-radius:8px; font-size:12.5px; cursor:pointer; margin-top:4px;}
+
+  .top-bar-admin{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;}
+  .empty-state{text-align:center; padding:30px 10px; color:var(--ink-soft);}
+  .section-toggle{display:flex; gap:8px; margin-bottom:18px;}
+  .section-toggle button{
+    background:none; border:none; padding:8px 4px; font-size:14px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; border-bottom:2px solid transparent; font-family:'Inter';
+  }
+  .section-toggle button.active{color:var(--teal-dark); border-bottom-color:var(--teal);}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const PASSWORD = "direcao2026"; // troque aqui se quiser outra senha
+const STORAGE_API_URL = "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT"; // termina em /exec
+
+let state = {
+  screen: 'home',
+  roster: [],
+  internId: null,
+  checkins: {},
+  adminAuthed: false,
+  adminDate: todayStr(),
+  adminSection: 'painel',
+  formSelecionados: [],
+  formOutro: false,
+  formOutroTexto: '',
+  formObs: '',
+  loading: true
+};
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function timeStr(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function dateLabel(str){
+  const [y,m,d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+async function storageGet(key){
+  try{
+    const res = await fetch(STORAGE_API_URL + '?key=' + encodeURIComponent(key));
+    const data = await res.json();
+    return data.value || null;
+  }catch(e){ console.error('Erro ao carregar', key, e); return null; }
+}
+async function storageSet(key, value){
+  try{
+    await fetch(STORAGE_API_URL, {
+      method: 'POST',
+      mode: 'no-cors', // necessário: evita que o redirecionamento interno do Google bloqueie o envio
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ key, value })
+    });
+  }catch(e){ console.error('Erro ao salvar', key, e); alert('Não foi possível salvar. Verifique sua conexão.'); }
+}
+async function loadRoster(){
+  const v = await storageGet('roster');
+  state.roster = v ? JSON.parse(v) : [];
+}
+async function loadCheckins(dateStr){
+  const v = await storageGet('checkins:'+dateStr);
+  state.checkins = v ? JSON.parse(v) : {};
+}
+async function saveRoster(){
+  await storageSet('roster', JSON.stringify(state.roster));
+}
+async function saveCheckins(dateStr){
+  await storageSet('checkins:'+dateStr, JSON.stringify(state.checkins));
+}
+
+async function init(){
+  await loadRoster();
+  if(state.roster.length === 0){
+    state.roster = [ {id:'e1', nome:'', opcoes:[{id:'o1', aluno:'', turma:''}]} ];
+  }
+  // migrate old format (aluno/turma direct on estagiário) if present
+  state.roster = state.roster.map(r => {
+    if(!r.opcoes){
+      return {id:r.id, nome:r.nome, opcoes:[{id:r.id+'-o1', aluno:r.aluno||'', turma:r.turma||''}]};
+    }
+    return r;
+  });
+  await loadCheckins(todayStr());
+  state.loading = false;
+  render();
+}
+
+function go(screen){ state.screen = screen; render(); }
+
+function render(){
+  const app = document.getElementById('app');
+  if(state.loading){ app.innerHTML = `<div class="wrap"><p class="muted">Carregando...</p></div>`; return; }
+
+  let html = `
+    <div class="top">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <h1>Check-in Estagiários/AEE</h1>
+          <p>GET Yolis da Silva</p>
+        </div>
+      </div>
+      ${state.screen !== 'home' ? `<button class="nav-btn" onclick="goHome()">← Início</button>` : ''}
+    </div>
+  `;
+
+  if(state.screen === 'home') html += renderHome();
+  else if(state.screen === 'intern-select') html += renderInternSelect();
+  else if(state.screen === 'intern-checkin') html += renderInternCheckin();
+  else if(state.screen === 'intern-done') html += renderInternDone();
+  else if(state.screen === 'admin-login') html += renderAdminLogin();
+  else if(state.screen === 'admin') html += renderAdmin();
+
+  app.innerHTML = html;
+}
+
+function goHome(){
+  state.internId = null;
+  state.formSelecionados = [];
+  state.formOutro = false;
+  state.formOutroTexto = '';
+  state.formObs = '';
+  go('home');
+}
+
+function renderHome(){
+  return `
+    <div class="choices">
+      <button class="choice" onclick="go('intern-select')">
+        <span class="icon">🙋</span>
+        <h3>Sou estagiário(a)/AEE</h3>
+        <p>Fazer meu check-in de hoje: marcar com quem estou.</p>
+      </button>
+      <button class="choice" onclick="go('admin-login')">
+        <span class="icon">🔑</span>
+        <h3>Sou da direção</h3>
+        <p>Ver o painel geral do dia e gerenciar a equipe de estagiários e AEEs.</p>
+      </button>
+    </div>
+  `;
+}
+
+function renderInternSelect(){
+  const options = state.roster
+    .filter(r => r.nome)
+    .map(r => `<option value="${r.id}">${r.nome}</option>`).join('');
+  return `
+    <div class="card">
+      <h3>Quem é você?</h3>
+      <label>Selecione seu nome</label>
+      <select id="internSelect" onchange="selectIntern(this.value)">
+        <option value="">Escolha...</option>
+        ${options}
+      </select>
+      <p class="muted" style="margin-top:12px;">Não encontrou seu nome? Peça para a direção te cadastrar no painel de administração.</p>
+    </div>
+  `;
+}
+
+function selectIntern(id){
+  if(!id) return;
+  state.internId = id;
+  const existing = state.checkins[id];
+  if(existing){
+    state.formSelecionados = existing.selecionados ? existing.selecionados.map(s => s.optId) : [];
+    state.formOutro = !!existing.outro;
+    state.formOutroTexto = existing.outro || '';
+    state.formObs = existing.obs || '';
+  } else {
+    state.formSelecionados = [];
+    state.formOutro = false;
+    state.formOutroTexto = '';
+    state.formObs = '';
+  }
+  go('intern-checkin');
+}
+
+function renderInternCheckin(){
+  const intern = state.roster.find(r => r.id === state.internId);
+  if(!intern) return `<div class="card"><p>Estagiário(a)/AEE não encontrado(a).</p></div>`;
+  const already = state.checkins[intern.id];
+  const opcoesValidas = intern.opcoes.filter(o => o.aluno);
+
+  return `
+    <div class="card">
+      <h3>Olá, ${intern.nome}</h3>
+      ${already ? `<p class="muted" style="margin-top:4px;">Você já fez check-in hoje às ${already.horario}. Pode atualizar abaixo se algo mudou.</p>` : ''}
+
+      <label>Com quem você está hoje? (marque uma ou mais opções)</label>
+      ${opcoesValidas.map(o => `
+        <label class="opt-check ${state.formSelecionados.includes(o.id)?'checked':''}">
+          <input type="checkbox" ${state.formSelecionados.includes(o.id)?'checked':''} onchange="toggleOpcao('${o.id}')">
+          <div>
+            <div class="opt-label">${o.aluno}</div>
+            <div class="opt-sub">${o.turma||''}</div>
+          </div>
+        </label>
+      `).join('')}
+
+      <label class="opt-check ${state.formOutro?'checked':''}" style="margin-top:12px;">
+        <input type="checkbox" ${state.formOutro?'checked':''} onchange="toggleOutro()">
+        <div class="opt-label">Outro / não está na lista</div>
+      </label>
+      ${state.formOutro ? `
+        <input type="text" placeholder="Com qual turma/aluno você está?" value="${state.formOutroTexto}" oninput="state.formOutroTexto=this.value" style="margin-top:8px;">
+      ` : ''}
+
+      <label>Observação (opcional)</label>
+      <input type="text" placeholder="Algo que a direção deveria saber?" value="${state.formObs}" oninput="state.formObs=this.value">
+
+      <button class="btn btn-primary btn-full" onclick="submitCheckin()">
+        ${already ? 'Atualizar check-in' : 'Confirmar check-in'}
+      </button>
+    </div>
+  `;
+}
+
+function toggleOpcao(optId){
+  const idx = state.formSelecionados.indexOf(optId);
+  if(idx >= 0) state.formSelecionados.splice(idx,1);
+  else state.formSelecionados.push(optId);
+  render();
+}
+function toggleOutro(){
+  state.formOutro = !state.formOutro;
+  if(!state.formOutro) state.formOutroTexto = '';
+  render();
+}
+
+async function submitCheckin(){
+  const intern = state.roster.find(r => r.id === state.internId);
+  if(state.formSelecionados.length === 0 && !(state.formOutro && state.formOutroTexto.trim())){
+    alert('Marque com quem você está hoje, ou preencha o campo "Outro".');
+    return;
+  }
+  const selecionados = intern.opcoes
+    .filter(o => state.formSelecionados.includes(o.id))
+    .map(o => ({optId:o.id, aluno:o.aluno, turma:o.turma}));
+
+  state.checkins[intern.id] = {
+    selecionados: selecionados,
+    outro: state.formOutro ? state.formOutroTexto.trim() : '',
+    obs: state.formObs.trim(),
+    horario: timeStr()
+  };
+  await saveCheckins(todayStr());
+  go('intern-done');
+}
+
+function renderInternDone(){
+  const intern = state.roster.find(r => r.id === state.internId);
+  return `
+    <div class="card confirm">
+      <div class="big-icon">✅</div>
+      <h3>Check-in registrado!</h3>
+      <p class="muted" style="margin-top:8px;">${intern ? intern.nome : ''} — ${timeStr()}</p>
+      <button class="btn btn-secondary" style="margin-top:18px;" onclick="goHome()">Voltar ao início</button>
+    </div>
+  `;
+}
+
+function renderAdminLogin(){
+  return `
+    <div class="card" style="max-width:360px; margin:0 auto;">
+      <h3>Painel da direção</h3>
+      <label>Senha</label>
+      <input type="password" id="adminPass" placeholder="Digite a senha">
+      <button class="btn btn-primary btn-full" onclick="tryAdminLogin()">Entrar</button>
+      <p class="muted" id="loginError" style="margin-top:10px;"></p>
+    </div>
+  `;
+}
+
+async function tryAdminLogin(){
+  const val = document.getElementById('adminPass').value;
+  if(val === PASSWORD){
+    state.adminAuthed = true;
+    state.adminDate = todayStr();
+    await loadCheckins(state.adminDate);
+    go('admin');
+  } else {
+    document.getElementById('loginError').textContent = 'Senha incorreta.';
+  }
+}
+
+async function changeAdminDate(val){
+  state.adminDate = val;
+  await loadCheckins(val);
+  render();
+}
+
+function renderAdmin(){
+  if(!state.adminAuthed) return renderAdminLogin();
+
+  const total = state.roster.filter(r=>r.nome).length;
+  const done = state.roster.filter(r=>r.nome && state.checkins[r.id]).length;
+  const pending = total - done;
+  const alteracoes = state.roster.filter(r => {
+    const c = state.checkins[r.id];
+    if(!c) return false;
+    const opcoesValidas = r.opcoes.filter(o=>o.aluno).length;
+    return !!c.outro || (c.selecionados||[]).length !== opcoesValidas;
+  }).length;
+
+  let body = `
+    <div class="top-bar-admin">
+      <div class="section-toggle">
+        <button class="${state.adminSection==='painel'?'active':''}" onclick="setAdminSection('painel')">Painel do dia</button>
+        <button class="${state.adminSection==='equipe'?'active':''}" onclick="setAdminSection('equipe')">Gerenciar equipe</button>
+      </div>
+      ${state.adminSection==='painel' ? `<input type="date" value="${state.adminDate}" onchange="changeAdminDate(this.value)" style="width:auto;">` : ''}
+    </div>
+  `;
+
+  if(state.adminSection === 'painel'){
+    body += `
+      <div class="summary-row">
+        <div class="summary-chip"><div class="num">${total}</div><div class="lbl">estagiários/AEEs</div></div>
+        <div class="summary-chip"><div class="num" style="color:var(--ok)">${done}</div><div class="lbl">check-ins feitos</div></div>
+        <div class="summary-chip"><div class="num" style="color:var(--pending)">${pending}</div><div class="lbl">pendentes</div></div>
+        <div class="summary-chip"><div class="num" style="color:var(--warn)">${alteracoes}</div><div class="lbl">com alteração</div></div>
+      </div>
+      <div class="card" style="padding:10px 0;">
+        ${total===0 ? `<div class="empty-state">Cadastre a equipe em "Gerenciar equipe" para começar.</div>` : `
+        <table>
+          <thead><tr><th>Estagiário(a)/AEE</th><th>Designado para</th><th>Status hoje</th><th>Está com hoje</th><th>Horário</th></tr></thead>
+          <tbody>
+            ${state.roster.filter(r=>r.nome).map(r => {
+              const c = state.checkins[r.id];
+              const opcoesValidas = r.opcoes.filter(o=>o.aluno);
+              const designado = opcoesValidas.map(o => o.aluno).join(', ') || '—';
+              let pill, atual, horario;
+              if(!c){
+                pill = `<span class="status-pill pill-pending">⏳ Sem check-in</span>`;
+                atual = '—'; horario = '—';
+              } else {
+                const isAlteracao = !!c.outro || (c.selecionados||[]).length !== opcoesValidas.length;
+                pill = isAlteracao
+                  ? `<span class="status-pill pill-warn">🔄 Alteração</span>`
+                  : `<span class="status-pill pill-ok">✅ Conforme designado</span>`;
+                const partes = (c.selecionados||[]).map(s => s.aluno);
+                if(c.outro) partes.push(`Outro: ${c.outro}`);
+                atual = partes.length ? partes.join(', ') : '—';
+                horario = c.horario;
+              }
+              return `<tr>
+                <td class="name-cell">${r.nome}</td>
+                <td>${designado}</td>
+                <td>${pill}</td>
+                <td>${atual}${c && c.obs ? `<br><span class="muted">Obs: ${c.obs}</span>` : ''}</td>
+                <td>${horario}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        `}
+      </div>
+      <p class="muted">Mostrando check-ins de ${dateLabel(state.adminDate)}. A lista atualiza automaticamente a cada 30s.</p>
+    `;
+  } else {
+    body += `
+      <div class="card">
+        <h3 style="margin-bottom:14px;">Equipe de estagiários e AEEs</h3>
+        <div id="rosterList">
+          ${state.roster.map((r,ri) => `
+            <div class="estagiario-block">
+              <div class="name-row">
+                <input type="text" placeholder="Nome do estagiário(a)/AEE" value="${r.nome}" oninput="updateNome(${ri},this.value)">
+                <button class="icon-btn" onclick="removeEstagiario(${ri})" title="Remover">✕</button>
+              </div>
+              <label style="margin:0 0 6px;">Alunos/turmas designados para esta pessoa</label>
+              ${r.opcoes.map((o,oi) => `
+                <div class="opcao-row">
+                  <input type="text" placeholder="Aluno" value="${o.aluno}" oninput="updateOpcao(${ri},${oi},'aluno',this.value)">
+                  <input type="text" placeholder="Turma" value="${o.turma}" oninput="updateOpcao(${ri},${oi},'turma',this.value)">
+                  <button class="icon-btn" onclick="removeOpcao(${ri},${oi})" title="Remover opção">✕</button>
+                </div>
+              `).join('')}
+              <button class="add-opt-btn" onclick="addOpcao(${ri})">+ adicionar outro aluno para ${r.nome || 'esta pessoa'}</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn btn-secondary" onclick="addEstagiario()">+ Adicionar estagiário(a)/AEE</button>
+        <button class="btn btn-primary" onclick="persistRoster()">Salvar equipe</button>
+        <p class="muted" id="rosterSaved" style="margin-top:8px;"></p>
+      </div>
+    `;
+  }
+
+  return body;
+}
+
+function setAdminSection(s){ state.adminSection = s; render(); }
+
+function addEstagiario(){
+  const id = 'e'+Date.now();
+  state.roster.push({id, nome:'', opcoes:[{id:id+'-o1', aluno:'', turma:''}]});
+  render();
+}
+function removeEstagiario(ri){
+  state.roster.splice(ri,1);
+  render();
+}
+function updateNome(ri, val){
+  state.roster[ri].nome = val;
+}
+function addOpcao(ri){
+  const r = state.roster[ri];
+  r.opcoes.push({id:r.id+'-o'+Date.now(), aluno:'', turma:''});
+  render();
+}
+function removeOpcao(ri, oi){
+  state.roster[ri].opcoes.splice(oi,1);
+  render();
+}
+function updateOpcao(ri, oi, field, val){
+  state.roster[ri].opcoes[oi][field] = val;
+}
+async function persistRoster(){
+  state.roster = state.roster.filter(r => r.nome.trim());
+  state.roster.forEach(r => { r.opcoes = r.opcoes.filter(o => o.aluno.trim()); });
+  await saveRoster();
+  render();
+  const el = document.getElementById('rosterSaved');
+  if(el) el.textContent = 'Equipe salva ✓';
+}
+
+setInterval(async () => {
+  if(state.screen === 'admin' && state.adminAuthed && state.adminSection === 'painel'){
+    await loadCheckins(state.adminDate);
+    render();
+  }
+}, 30000);
+
+init();
+</script>
+</body>
+</html>
